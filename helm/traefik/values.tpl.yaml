@@ -12,7 +12,7 @@ forwardedHeaders:
     - 10.0.0.0/8
 dashboard:
   enabled: true
-  domain: traefik.##DOMAIN##
+  domain: traefik.${DOMAIN}
 service:
   annotations:
     service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
@@ -24,16 +24,15 @@ accessLogs:
 rbac:
   enabled: true
 acme:
-  enabled: true
+  enabled: false
   challengeType: "dns-01"
   dnsProvider:
     name: "digitalocean"
     digitalocean:
-      DO_AUTH_TOKEN: "##TOKEN##"
+      DO_AUTH_TOKEN: "${TOKEN}"
   domains:
     enabled: true
     domainsList:
-      - main: "*.##DOMAIN##"
+      - main: "*.${DOMAIN}"
       - sans:
-        - "##DOMAIN##"
-
+        - "${DOMAIN}"

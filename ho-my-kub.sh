@@ -1,28 +1,27 @@
 #!/bin/bash
 
-usage() { echo "Usage: $0 <-c create | -d destroy> -p provider [-h]"; }
+usage() { echo "Usage: $0 <-c create | -d destroy> [-h]"; }
 
-while getopts "hcdp:" option; do
+while getopts "hcd" option; do
     case "${option}" in
         h) usage && exit 0;;
 	c) ACTION=create;;
 	d) ACTION=destroy;;
-	p) PROVIDER=${OPTARG};;
         *) usage && exit 1;;
     esac
 done
+
+BASEDIR=$(dirname $(readlink -f $0))
+INFRADIR=$BASEDIR/k8s_infra
+HELMDIR=$BASEDIR/helm
+. $BASEDIR/setup
 
 case $PROVIDER in
     digitalocean) TFVARS=k8s_infra_do.tfvars;;
     *) echo "$PROVIDER is not a supported provider!" && usage && exit 1;;
 esac
 
-BASEDIR=$(dirname $(readlink -f $0))
-INFRADIR=$BASEDIR/k8s_infra
-HELMDIR=$BASEDIR/helm
-
 [[ ! -f $TFVARS ]] && echo "Terraform variables file $TFVARS not found !" && exit 1
-[[ -z $TOKEN ]] && echo "Enter your $PROVIDER token" && read TOKEN
 
 if [[ $ACTION == "destroy" ]]; then
     # PROTIP TO DESTROY CLOUD MANAGED LB
@@ -46,6 +45,7 @@ if [[ $ACTION == "create" || $ACTION == "init_helm" ]]; then
     curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash || exit 1
     helm repo add stable https://kubernetes-charts.storage.googleapis.com/
     helm repo update
+    envsubst < $HELMDIR/traefik/values.tpl.yaml > $HELMDIR/traefik/values.yaml
     helm upgrade --install traefik --namespace kube-system --values $HELMDIR/traefik/values.yaml stable/traefik || exit 1
     external_ip=""
     while [ -z $external_ip ]; do
