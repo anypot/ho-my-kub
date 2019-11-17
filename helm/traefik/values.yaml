@@ -1,0 +1,39 @@
+kubernetes:
+  namespaces:
+    - kube-system
+    - default
+proxyProtocol:
+  enabled: true
+  trustedIPs:
+    - 10.0.0.0/8
+forwardedHeaders:
+  enabled: true
+  trustedIPs:
+    - 10.0.0.0/8
+dashboard:
+  enabled: true
+  domain: traefik.##DOMAIN##
+service:
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
+    service.beta.kubernetes.io/do-loadbalancer-tls-ports: "443"
+    service.beta.kubernetes.io/do-loadbalancer-tls-passthrough: "true"
+    service.beta.kubernetes.io/do-loadbalancer-enable-proxy-protocol: "true"
+accessLogs:
+  enabled: true
+rbac:
+  enabled: true
+acme:
+  enabled: true
+  challengeType: "dns-01"
+  dnsProvider:
+    name: "digitalocean"
+    digitalocean:
+      DO_AUTH_TOKEN: "##TOKEN##"
+  domains:
+    enabled: true
+    domainsList:
+      - main: "*.##DOMAIN##"
+      - sans:
+        - "##DOMAIN##"
+
