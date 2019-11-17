@@ -1,4 +1,4 @@
 export PROVIDER="yourprovider"
 export TOKEN="yourprovidertoken"
 export DOMAIN="domain.example"
-
+export EMAIL="emailforacme"

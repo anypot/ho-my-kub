@@ -23,8 +23,12 @@ accessLogs:
   enabled: true
 rbac:
   enabled: true
+ssl:
+  enabled: true
 acme:
-  enabled: false
+  enabled: true
+  staging: false
+  email: "${EMAIL}"
   challengeType: "dns-01"
   dnsProvider:
     name: "digitalocean"
